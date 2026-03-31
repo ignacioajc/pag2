@@ -28,8 +28,8 @@
     border: 1px solid #e2dfd2;
     border-radius: 4px;
     font-size: 1rem;
-    background: #fff;
-    color: #181818;
+    background: var(--search-bg);
+    color: var(--text);
     box-sizing: border-box;
     resize: vertical;
 }
