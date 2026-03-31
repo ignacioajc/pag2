@@ -111,9 +111,9 @@
 
     // ---------------- Subastas de ejemplo ----------------
     const auctions = [
-        {id:'air-zone-1', title:'Air Zone 1 (Limited)', img:'images/bball-shoe.jpg', currentBid:129.99, ends: Date.now()+1000*60*60*6},
-        {id:'raptor-gloves', title:'Guantes Raptor (Signed)', img:'images/boxing-gloves.jpg', currentBid:199.00, ends: Date.now()+1000*60*60*24},
-        {id:'speedkick-fg', title:'SpeedKick FG (Rare)', img:'images/football-boot.jpg', currentBid:249.50, ends: Date.now()+1000*60*45}
+        {id:'air-zone-1', title:'Air Zone 1 (Limited)', img:'images/bball-shoe.svg', currentBid:129.99, ends: Date.now()+1000*60*60*6},
+        {id:'raptor-gloves', title:'Guantes Raptor (Signed)', img:'images/boxing-gloves.svg', currentBid:199.00, ends: Date.now()+1000*60*60*24},
+        {id:'speedkick-fg', title:'SpeedKick FG (Rare)', img:'images/football-boot.svg', currentBid:249.50, ends: Date.now()+1000*60*45}
     ];
 
     const auctionGrid = document.getElementById('auctionGrid');
