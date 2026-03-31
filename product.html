@@ -22,11 +22,18 @@
         <section class="product-page">
             <div>
                 <div class="product-hero">
-                    <img id="productImg" src="images/basketball.jpg" alt="Producto">
+                    <div class="gallery">
+                        <img id="productImg" src="images/basketball.jpg" alt="Producto" style="width:280px;height:280px;object-fit:cover;border-radius:8px">
+                        <div id="thumbnails" style="display:flex;gap:.5rem;margin-top:.6rem"></div>
+                    </div>
                     <div>
                         <h1 id="productTitle">Artículo</h1>
                         <div id="currentPrice" style="font-size:1.4rem;font-weight:800;margin-top:.3rem">€0.00</div>
                         <div id="priceChange" style="margin-top:.3rem;color:#4a4a4a"></div>
+                        <div style="margin-top:.8rem;display:flex;gap:.6rem">
+                            <button id="buyNow" class="btn buy-now">Comprar ahora</button>
+                            <button id="addCart" class="btn add-to-cart" style="background:#444;color:#fff" data-id="" data-title="">Agregar al carrito</button>
+                        </div>
                     </div>
                 </div>
 

@@ -118,6 +118,18 @@ body.darkmode .servicio-contacto a:hover {
     box-shadow: 0 2px 8px #0001;
     transition: background 0.2s, color 0.2s;
 }
+
+/* Variables para modo oscuro (se aplican cuando body tiene clase .darkmode) */
+body.darkmode{
+    --bg: #23232b;
+    --panel: #2d2d38;
+    --text: #e0e0e0;
+    --card: #23232b;
+    --border: #3a2352;
+    --search-bg: #23232b;
+    --accent: #b39ddb;
+    --accent-2: #b39ddb;
+}
 .darkmode-btn.active {
     background: #3a2352;
     color: #fff;
@@ -401,6 +413,9 @@ a:hover {
     --muted: #6b6b6b;
     --accent: #3a2352;
     --accent-2: #b39ddb;
+    --card: #ffffff;
+    --border: rgba(0,0,0,0.04);
+    --search-bg: #ffffff;
 }
 body, header, main, footer, .product-card, .auction-card, .contactar-cliente-form{
     transition: background-color 360ms ease, color 360ms ease, border-color 360ms ease, box-shadow 360ms ease;
@@ -416,7 +431,7 @@ body{font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvet
 
 /* Search */
 .header-actions{display:flex;align-items:center;gap:0.6rem}
-.site-search{padding:0.45rem 0.6rem;border-radius:8px;border:1px solid #e2dfd2;background:#fff;min-width:200px}
+.site-search{padding:0.45rem 0.6rem;border-radius:8px;border:1px solid var(--border);background:var(--search-bg);min-width:200px}
 .site-search:focus{outline:3px solid rgba(59,35,82,0.14)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
@@ -460,8 +475,8 @@ body{font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvet
     margin-top:1rem;
 }
 .auction-card{
-    background:#fff;
-    border:1px solid #e9e7dc;
+    background:var(--card);
+    border:1px solid var(--border);
     padding:0.8rem;border-radius:8px;display:flex;flex-direction:column;gap:0.5rem
 }
 .auction-card:hover{transform:translateY(-4px);box-shadow:0 8px 18px rgba(0,0,0,0.06)}
@@ -471,7 +486,7 @@ body{font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvet
 .auction-countdown{font-family:monospace;color:#555}
 
 /* StockX-like price history container (used in product.html) */
-.price-panel{background:#fff;border-radius:10px;padding:1rem;border:1px solid #e9e7dc}
+.price-panel{background:var(--card);border-radius:10px;padding:1rem;border:1px solid var(--border)}
 .price-summary{display:flex;gap:1rem;justify-content:space-between;align-items:center}
 .price-history-list{margin-top:0.8rem;display:flex;flex-direction:column;gap:0.4rem}
 .price-badge{display:inline-block;padding:0.25rem 0.5rem;border-radius:6px;font-weight:700}
@@ -496,4 +511,15 @@ body{font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvet
 /* Animaciones de entrada */
 .fade-in{opacity:0;transform:translateY(6px);animation:fadeInUp .48s forwards}
 @keyframes fadeInUp{to{opacity:1;transform:none}}
+
+/* Carrito */
+.cart-btn{background:transparent;border:1px solid var(--border);padding:0.35rem 0.6rem;border-radius:8px;cursor:pointer;color:var(--text);display:inline-flex;align-items:center;gap:0.4rem}
+.cart-count{background:var(--accent);color:#fff;border-radius:999px;padding:0 6px;font-size:0.75rem;margin-left:4px}
+.cart-panel{position:fixed;right:18px;top:64px;width:320px;max-height:70vh;background:var(--card);border:1px solid var(--border);box-shadow:0 12px 40px rgba(0,0,0,0.12);border-radius:10px;padding:0.6rem;overflow:auto;z-index:120}
+.cart-panel h3{margin:0 0 0.6rem 0}
+.cart-item{display:flex;gap:0.6rem;align-items:center;padding:0.45rem 0;border-bottom:1px solid rgba(0,0,0,0.04)}
+.cart-item img{width:56px;height:46px;object-fit:cover;border-radius:6px}
+.cart-actions{display:flex;gap:0.4rem;align-items:center}
+.cart-empty{color:var(--muted);padding:0.6rem;text-align:center}
+
 

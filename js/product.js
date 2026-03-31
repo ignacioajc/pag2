@@ -1,8 +1,6 @@
 // Genera datos de precios del último año y renderiza gráfico estilo StockX
 (function(){
-    function qs(name){
-        return new URLSearchParams(location.search).get(name);
-    }
+    function qs(name){ return new URLSearchParams(location.search).get(name); }
 
     const id = qs('id') || 'unknown';
     const products = {
@@ -16,8 +14,25 @@
     };
 
     const p = products[id] || products.unknown;
-    document.getElementById('productTitle').textContent = p.title;
-    document.getElementById('productImg').src = p.img;
+    const mainImg = document.getElementById('productImg');
+    const titleEl = document.getElementById('productTitle');
+    const currentPriceEl = document.getElementById('currentPrice');
+    const thumbnailsEl = document.getElementById('thumbnails');
+    const addCartBtn = document.getElementById('addCart');
+    const buyNowBtn = document.getElementById('buyNow');
+
+    titleEl.textContent = p.title;
+    mainImg.src = p.img;
+
+    // Prepare images array (could be expanded with real assets)
+    const images = [p.img, p.img];
+    images.forEach((src,i)=>{
+        const t = document.createElement('img');
+        t.src = src; t.alt = p.title + ' ' + (i+1);
+        t.style.width = '56px'; t.style.height='56px'; t.style.objectFit='cover'; t.style.cursor='pointer'; t.style.borderRadius='6px';
+        t.addEventListener('click', ()=> mainImg.src = src);
+        thumbnailsEl.appendChild(t);
+    });
 
     // Generar precios para los últimos 365 días (random walk)
     const days = 365;
@@ -28,7 +43,6 @@
     for(let i=0;i<days;i++){
         const dt = new Date(start + i*24*60*60*1000);
         labels.push(dt.toLocaleDateString('es-ES',{month:'short',day:'numeric'}));
-        // random walk pct -1.5%..+1.5%
         const pct = (Math.random()-0.5)*0.03;
         price = Math.max(5, price * (1 + pct));
         values.push(Math.round(price*100)/100);
@@ -42,7 +56,7 @@
     document.getElementById('summaryMax').textContent = 'Max ' + '€' + max.toFixed(2);
     document.getElementById('summaryMin').textContent = 'Min ' + '€' + min.toFixed(2);
     document.getElementById('summaryLast').textContent = '€' + last.toFixed(2);
-    document.getElementById('currentPrice').textContent = '€' + last.toFixed(2);
+    currentPriceEl.textContent = '€' + last.toFixed(2);
 
     // Lista de precios (mensual: cada ~30 días)
     const historyEl = document.getElementById('priceHistory');
@@ -50,7 +64,7 @@
         const idx = Math.floor((m/11)*(values.length-1));
         const v = values[idx];
         const div = document.createElement('div');
-        div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:.9rem;color:#666">Hace ${12-m}m</div><div class="price-badge ${v>last? 'up':'down'}">€${v.toFixed(2)}</div></div>`;
+        div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:.9rem;color:var(--muted)">Hace ${12-m}m</div><div class="price-badge ${v>last? 'up':'down'}">€${v.toFixed(2)}</div></div>`;
         historyEl.appendChild(div);
     }
 
@@ -67,7 +81,7 @@
             datasets: [{
                 label: 'Precio (€)',
                 data: values,
-                borderColor: '#3a2352',
+                borderColor: 'var(--accent)',
                 backgroundColor: gradient,
                 fill: true,
                 pointRadius: 0.8,
@@ -83,5 +97,32 @@
             elements:{line:{borderWidth:2}}
         }
     });
+
+    // Configurar botones de compra
+    if(addCartBtn){
+        addCartBtn.dataset.id = id;
+        addCartBtn.dataset.title = p.title;
+        addCartBtn.dataset.price = last;
+        addCartBtn.dataset.img = images[0];
+        addCartBtn.addEventListener('click', ()=>{
+            if(window.cartAPI && window.cartAPI.add){ window.cartAPI.add({id, title: p.title, price: last, img: images[0], qty:1}); }
+            else {
+                const cart = JSON.parse(localStorage.getItem('shop_cart_v1')||'[]');
+                cart.push({id, title:p.title, price:last, img:images[0], qty:1});
+                localStorage.setItem('shop_cart_v1', JSON.stringify(cart));
+            }
+            // open cart if header exists
+            document.getElementById('cartBtn')?.click();
+        });
+    }
+
+    if(buyNowBtn){
+        buyNowBtn.addEventListener('click', ()=>{
+            if(window.cartAPI && window.cartAPI.add){ window.cartAPI.add({id, title: p.title, price: last, img: images[0], qty:1}); }
+            alert('Compra simulada: redirigiendo al checkout (demo)');
+            // simulate checkout flow
+            document.getElementById('cartBtn')?.click();
+        });
+    }
 
 })();
