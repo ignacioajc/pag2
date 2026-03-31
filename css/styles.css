@@ -72,9 +72,9 @@ body.darkmode .contactar-cliente-form button:hover {
 .servicio-contacto {
     margin: 1.1rem 0 1.2rem 0;
     padding: 0.7rem 1rem;
-    background: #fffbe6;
-    color: #181818;
-    border: 1px solid #e2dfd2;
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
     border-radius: 6px;
     font-size: 1.05rem;
     box-shadow: none;
