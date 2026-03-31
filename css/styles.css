@@ -1,0 +1,499 @@
+/* Formulario contactar cliente */
+.contactar-cliente-form {
+    margin-top: 2rem;
+    padding: 1.1rem 1rem 1.3rem 1rem;
+    background: #fffbe6;
+    border: 1px solid #e2dfd2;
+    border-radius: 6px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: none;
+}
+.contactar-cliente-form h3 {
+    margin-top: 0;
+    color: #181818;
+    font-size: 1.1rem;
+    margin-bottom: 0.7rem;
+}
+.contactar-cliente-form label {
+    font-weight: 500;
+    color: #181818;
+}
+.contactar-cliente-form input,
+.contactar-cliente-form textarea {
+    width: 100%;
+    margin: 0.3rem 0 1rem 0;
+    padding: 0.5rem;
+    border: 1px solid #e2dfd2;
+    border-radius: 4px;
+    font-size: 1rem;
+    background: #fff;
+    color: #181818;
+    box-sizing: border-box;
+    resize: vertical;
+}
+.contactar-cliente-form button {
+    background: #181818;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.contactar-cliente-form button:hover {
+    background: #3a2352;
+}
+body.darkmode .contactar-cliente-form {
+    background: #2d2d38;
+    border: 1px solid #3a2352;
+}
+body.darkmode .contactar-cliente-form h3,
+body.darkmode .contactar-cliente-form label {
+    color: #e0e0e0;
+}
+body.darkmode .contactar-cliente-form input,
+body.darkmode .contactar-cliente-form textarea {
+    background: #23232b;
+    color: #e0e0e0;
+    border: 1px solid #3a2352;
+}
+body.darkmode .contactar-cliente-form button {
+    background: #3a2352;
+    color: #fff;
+}
+body.darkmode .contactar-cliente-form button:hover {
+    background: #181818;
+}
+/* Contacto Servicio Técnico */
+.servicio-contacto {
+    margin: 1.1rem 0 1.2rem 0;
+    padding: 0.7rem 1rem;
+    background: #fffbe6;
+    color: #181818;
+    border: 1px solid #e2dfd2;
+    border-radius: 6px;
+    font-size: 1.05rem;
+    box-shadow: none;
+}
+.servicio-contacto a {
+    color: #181818;
+    text-decoration: underline;
+    font-weight: 500;
+}
+.servicio-contacto a:hover {
+    color: #fff;
+    background: #181818;
+    border-radius: 3px;
+}
+body.darkmode .servicio-contacto {
+    background: #2d2d38;
+    color: #e0e0e0;
+    border: 1px solid #3a2352;
+}
+body.darkmode .servicio-contacto a {
+    color: #b39ddb;
+}
+body.darkmode .servicio-contacto a:hover {
+    color: #fff;
+    background: #3a2352;
+}
+/* Botón modo oscuro */
+.darkmode-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 100;
+    background: #fff;
+    color: #181818;
+    border: 1px solid #e2dfd2;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px #0001;
+    transition: background 0.2s, color 0.2s;
+}
+.darkmode-btn.active {
+    background: #3a2352;
+    color: #fff;
+    border: 1px solid #3a2352;
+}
+/* Modo oscuro: escala de grises y morado oscuro */
+body.darkmode {
+    background: #23232b;
+    color: #e0e0e0;
+}
+body.darkmode header,
+body.darkmode #hero,
+body.darkmode #servicio,
+body.darkmode footer {
+    background: #2d2d38;
+    color: #e0e0e0;
+    border-color: #3a2352;
+}
+body.darkmode .logo-nav {
+    background: none;
+}
+body.darkmode .logo-space {
+    background: none;
+}
+body.darkmode nav a {
+    color: #e0e0e0;
+    background: none;
+}
+body.darkmode nav a:hover {
+    background: #3a2352;
+    color: #fff;
+}
+body.darkmode #hero h1,
+body.darkmode #beneficios h2,
+body.darkmode #servicio h2,
+body.darkmode footer h2 {
+    color: #b39ddb;
+    background: none;
+}
+body.darkmode #beneficios ul {
+    background: none;
+}
+body.darkmode #beneficios li {
+    background: #23232b;
+    border: 1px solid #3a2352;
+    color: #e0e0e0;
+}
+body.darkmode #beneficios h3 {
+    color: #b39ddb;
+    background: none;
+}
+body.darkmode .servicio-lista,
+body.darkmode address {
+    color: #e0e0e0;
+}
+body.darkmode a {
+    color: #b39ddb;
+}
+body.darkmode a:hover {
+    color: #fff;
+    background: #3a2352;
+}
+body.darkmode .darkmode-btn {
+    background: #3a2352;
+    color: #fff;
+    border: 1px solid #b39ddb;
+}
+/* styles.css - Estilo minimalista rojo y negro */
+
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f7f5ed;
+    color: #181818;
+}
+
+header {
+    background: #f3f1e7;
+    padding: 1.2rem 0 1.2rem 0;
+    border-bottom: 2px solid #e2dfd2;
+    box-shadow: none;
+}
+.logo-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.2rem;
+}
+.logo-space {
+    min-width: 120px;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+.logo {
+    height: 56px;
+    max-width: 120px;
+    object-fit: contain;
+    filter: none;
+}
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+}
+nav a {
+    color: #181818;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    padding: 0.2em 0.7em;
+    border-radius: 4px;
+    background: none;
+    transition: background 0.2s, color 0.2s;
+}
+nav a:hover {
+    background: #e2dfd2;
+    color: #181818;
+}
+main {
+    max-width: 900px;
+    margin: 2.5rem auto 1.5rem auto;
+    padding: 0 1rem;
+}
+#hero {
+    text-align: center;
+    margin-bottom: 2.2rem;
+    background: #f3f1e7;
+    border-radius: 12px;
+    box-shadow: none;
+    padding: 1.5rem 0.5rem 1.2rem 0.5rem;
+}
+#hero h1 {
+    color: #181818;
+    background: none;
+    display: inline-block;
+    padding: 0.2em 0.7em;
+    border-radius: 8px;
+    font-size: 2.1rem;
+    margin-bottom: 1rem;
+    box-shadow: none;
+}
+#hero p {
+    color: #181818;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+}
+#beneficios h2 {
+    color: #181818;
+    margin-bottom: 1.2rem;
+    text-align: center;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    text-shadow: none;
+}
+#beneficios ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    justify-content: center;
+    padding: 0;
+}
+#beneficios li {
+    background: #f7f5ed;
+    border: 1px solid #e2dfd2;
+    border-radius: 8px;
+    padding: 1.2rem 0.7rem;
+    min-width: 180px;
+    max-width: 220px;
+    flex: 1 1 180px;
+    color: #181818;
+    box-shadow: none;
+    font-size: 1rem;
+}
+#beneficios h3 {
+    color: #181818;
+    background: none;
+    display: inline-block;
+    padding: 0.1em 0.5em;
+    border-radius: 4px;
+    margin-top: 0;
+    margin-bottom: 0.5em;
+    font-size: 1.1rem;
+    box-shadow: none;
+}
+/* Servicio al Cliente */
+#servicio {
+    background: #f3f1e7;
+    border-radius: 8px;
+    margin: 2rem 0 1.5rem 0;
+    padding: 1.2rem 0.7rem;
+    box-shadow: none;
+}
+#servicio h2 {
+    color: #181818;
+    font-size: 1.3rem;
+    margin-bottom: 0.7rem;
+}
+.servicio-lista {
+    margin: 1rem 0 0 0;
+    padding-left: 1.2rem;
+    color: #181818;
+}
+.servicio-lista li {
+    margin-bottom: 0.4rem;
+}
+footer {
+    background: #f3f1e7;
+    color: #181818;
+    text-align: center;
+    padding: 1.5rem 1rem 1rem 1rem;
+    border-top: 2px solid #e2dfd2;
+    box-shadow: none;
+}
+footer h2 {
+    color: #181818;
+    background: none;
+    display: inline-block;
+    padding: 0.1em 0.7em;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    box-shadow: none;
+}
+address {
+    font-style: normal;
+    color: #181818;
+}
+a {
+    color: #181818;
+    text-decoration: underline;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+a:hover {
+    color: #fff;
+    background: #181818;
+    border-radius: 4px;
+}
+@media (max-width: 700px) {
+    .darkmode-btn {
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
+    }
+    .logo-nav, main {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 0.5rem;
+    }
+    #beneficios ul {
+        flex-direction: column;
+        gap: 0.7rem;
+    }
+    #hero {
+        padding: 0.7rem 0.2rem 0.7rem 0.2rem;
+    }
+    #beneficios li {
+        min-width: 0;
+        max-width: 100%;
+    }
+    .logo-space {
+        min-width: 80px;
+        min-height: 40px;
+    }
+}
+
+/* TRANSICIONES SUAVES PARA MODO OSCURO */
+:root{
+    --bg: #f7f5ed;
+    --panel: #f3f1e7;
+    --text: #181818;
+    --muted: #6b6b6b;
+    --accent: #3a2352;
+    --accent-2: #b39ddb;
+}
+body, header, main, footer, .product-card, .auction-card, .contactar-cliente-form{
+    transition: background-color 360ms ease, color 360ms ease, border-color 360ms ease, box-shadow 360ms ease;
+}
+
+/* Tipografía global */
+body{font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif}
+
+/* Mobile nav toggle */
+.nav-toggle{display:none;position:absolute;left:16px;top:18px;background:transparent;border:none;font-size:1.4rem;cursor:pointer}
+.logo-nav{align-items:center}
+.logo-nav.open nav ul{display:flex}
+
+/* Search */
+.header-actions{display:flex;align-items:center;gap:0.6rem}
+.site-search{padding:0.45rem 0.6rem;border-radius:8px;border:1px solid #e2dfd2;background:#fff;min-width:200px}
+.site-search:focus{outline:3px solid rgba(59,35,82,0.14)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* Productos */
+.categories {
+    display: grid;
+    gap: 1.4rem;
+}
+.category {
+    background: var(--panel);
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid #e2dfd2;
+}
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 0.8rem;
+}
+.product-card {
+    background: #fff;
+    border: 1px solid #e9e7dc;
+    border-radius: 8px;
+    padding: 0.6rem;
+    text-align: center;
+    transform: translateY(0);transition:transform 220ms ease, box-shadow 220ms ease
+}
+.product-card:hover{transform:translateY(-6px);box-shadow:0 8px 20px rgba(0,0,0,0.08)}
+.product-card img{width:100%;height:140px;object-fit:cover;border-radius:6px}
+.product-card h4{margin:0.6rem 0 0.3rem 0;font-size:1rem}
+.product-card .price{font-weight:700;color:var(--text);margin-bottom:0.5rem}
+.btn{display:inline-block;padding:0.45rem 0.8rem;border-radius:6px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+.btn:hover{opacity:0.95}
+
+/* Subastas */
+.auction-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:1rem;
+    margin-top:1rem;
+}
+.auction-card{
+    background:#fff;
+    border:1px solid #e9e7dc;
+    padding:0.8rem;border-radius:8px;display:flex;flex-direction:column;gap:0.5rem
+}
+.auction-card:hover{transform:translateY(-4px);box-shadow:0 8px 18px rgba(0,0,0,0.06)}
+.auction-card img{width:100%;height:120px;object-fit:cover;border-radius:6px}
+.auction-meta{display:flex;justify-content:space-between;align-items:center}
+.auction-price{font-weight:800;color:#111}
+.auction-countdown{font-family:monospace;color:#555}
+
+/* StockX-like price history container (used in product.html) */
+.price-panel{background:#fff;border-radius:10px;padding:1rem;border:1px solid #e9e7dc}
+.price-summary{display:flex;gap:1rem;justify-content:space-between;align-items:center}
+.price-history-list{margin-top:0.8rem;display:flex;flex-direction:column;gap:0.4rem}
+.price-badge{display:inline-block;padding:0.25rem 0.5rem;border-radius:6px;font-weight:700}
+.up{background:#ecf7ee;color:#0a6b28}
+.down{background:#fff5f6;color:#8b1d1d}
+
+@media (max-width:800px){
+    .price-summary{flex-direction:column;align-items:flex-start}
+}
+
+@media (max-width:700px){
+    .nav-toggle{display:block}
+    .logo-nav nav ul{display:none;position:absolute;left:0;top:64px;right:0;background:var(--panel);flex-direction:column;padding:1rem;gap:0.5rem;border-top:1px solid #e2dfd2}
+    .logo-nav.open nav ul{display:flex}
+    .site-search{min-width:120px}
+}
+
+/* Accesibilidad: focus visible */
+:focus{outline: none}
+:focus-visible{outline:3px solid rgba(59,35,82,0.18);border-radius:6px}
+
+/* Animaciones de entrada */
+.fade-in{opacity:0;transform:translateY(6px);animation:fadeInUp .48s forwards}
+@keyframes fadeInUp{to{opacity:1;transform:none}}
+
