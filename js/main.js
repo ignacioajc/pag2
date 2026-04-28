@@ -193,6 +193,158 @@
         });
     }
 
+    const secureUser = {
+        username: 'alumno',
+        email: 'alumno@ejemplo.com',
+        password: 'Alu123456'
+    };
+
+    const formState = {
+        registerForm: document.getElementById('registerForm'),
+        loginForm: document.getElementById('loginForm'),
+        contactForm: document.getElementById('contactForm'),
+        registerMessage: document.getElementById('registerMessage'),
+        loginMessage: document.getElementById('loginMessage'),
+        contactResult: document.getElementById('contactResult'),
+        contactMessageField: document.getElementById('contactMessage'),
+        messageCounter: document.getElementById('messageCounter')
+    };
+
+    function getInputValue(id){
+        const input = document.getElementById(id);
+        return input ? input.value.trim() : '';
+    }
+
+    function clearMessage(el){
+        if(!el) return;
+        el.textContent = '';
+        el.classList.remove('message--error', 'message--success');
+    }
+
+    function showMessage(el, text, type = 'error'){
+        if(!el) return;
+        el.textContent = text;
+        el.classList.remove('message--error', 'message--success');
+        el.classList.add(type === 'success' ? 'message--success' : 'message--error');
+    }
+
+    function isValidEmail(email){
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function validateRegister(data){
+        const errors = [];
+        if(!data.username) errors.push('Usuario obligatorio.');
+        if(!data.email) errors.push('Email obligatorio.');
+        else if(!isValidEmail(data.email)) errors.push('Email con formato incorrecto.');
+        if(!data.password) errors.push('Contraseña obligatoria.');
+        else if(data.password.length < 8) errors.push('La contraseña debe tener al menos 8 caracteres.');
+        if(data.password !== data.confirmPassword) errors.push('Las contraseñas deben coincidir.');
+        return errors;
+    }
+
+    function validateLogin(data){
+        const errors = [];
+        if(!data.email) errors.push('Email obligatorio.');
+        else if(!isValidEmail(data.email)) errors.push('Email con formato incorrecto.');
+        if(!data.password) errors.push('Contraseña obligatoria.');
+        return errors;
+    }
+
+    function validateContact(data){
+        const errors = [];
+        if(!data.name) errors.push('Nombre obligatorio.');
+        if(!data.subject) errors.push('Asunto obligatorio.');
+        if(!data.message) errors.push('Mensaje obligatorio.');
+        return errors;
+    }
+
+    function authenticateLogin(credentials){
+        return credentials.email === secureUser.email && credentials.password === secureUser.password;
+    }
+
+    function clearForm(form){
+        if(!form) return;
+        form.reset();
+        const messages = form.querySelectorAll('.message');
+        messages.forEach(msg => { msg.textContent = ''; msg.classList.remove('message--error', 'message--success'); });
+    }
+
+    function handleRegisterSubmit(event){
+        event.preventDefault();
+        const payload = {
+            username: getInputValue('registerUsername'),
+            email: getInputValue('registerEmail'),
+            password: getInputValue('registerPassword'),
+            confirmPassword: getInputValue('registerConfirmPassword')
+        };
+        clearMessage(formState.registerMessage);
+        const errors = validateRegister(payload);
+        if(errors.length){
+            showMessage(formState.registerMessage, errors.join(' '));
+            return;
+        }
+        showMessage(formState.registerMessage, `Registro válido. Bienvenido ${payload.username}.`, 'success');
+    }
+
+    function handleLoginSubmit(event){
+        event.preventDefault();
+        const payload = {
+            email: getInputValue('loginEmail'),
+            password: getInputValue('loginPassword')
+        };
+        clearMessage(formState.loginMessage);
+        const errors = validateLogin(payload);
+        if(errors.length){
+            showMessage(formState.loginMessage, errors.join(' '));
+            return;
+        }
+        if(!authenticateLogin(payload)){
+            showMessage(formState.loginMessage, 'Credenciales incorrectas, revisa email y contraseña.');
+            return;
+        }
+        showMessage(formState.loginMessage, 'Ingreso exitoso. Usuario autenticado.', 'success');
+    }
+
+    function updateMessageCounter(){
+        if(!formState.contactMessageField || !formState.messageCounter) return;
+        const count = formState.contactMessageField.value.length;
+        formState.messageCounter.textContent = `${count}/250`;
+        formState.messageCounter.classList.toggle('limit-exceeded', count > 250);
+    }
+
+    function handleContactSubmit(event){
+        event.preventDefault();
+        const payload = {
+            name: getInputValue('contactName'),
+            subject: getInputValue('contactSubject'),
+            message: getInputValue('contactMessage')
+        };
+        clearMessage(formState.contactResult);
+        const errors = validateContact(payload);
+        if(errors.length){
+            showMessage(formState.contactResult, errors.join(' '));
+            return;
+        }
+        showMessage(formState.contactResult, 'Mensaje enviado correctamente. Gracias por contactarnos.', 'success');
+        clearForm(formState.contactForm);
+        updateMessageCounter();
+    }
+
+    if(formState.registerForm){
+        formState.registerForm.addEventListener('submit', handleRegisterSubmit);
+    }
+    if(formState.loginForm){
+        formState.loginForm.addEventListener('submit', handleLoginSubmit);
+    }
+    if(formState.contactForm){
+        formState.contactForm.addEventListener('submit', handleContactSubmit);
+    }
+    if(formState.contactMessageField){
+        formState.contactMessageField.addEventListener('input', updateMessageCounter);
+        updateMessageCounter();
+    }
+
     // Delegación para botones "Agregar al carrito" desde cualquier página
     document.addEventListener('click', (e)=>{
         const add = e.target.closest('.add-to-cart');

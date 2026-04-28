@@ -109,6 +109,74 @@
 			</div>
 		</section>
 
+		<section id="forms" class="content-section">
+			<h2>Acceso rápido y contacto</h2>
+			<div class="form-grid">
+				<article class="form-card">
+					<h3>Registro</h3>
+					<form id="registerForm" novalidate>
+						<div class="form-group">
+							<label for="registerUsername">Usuario</label>
+							<input type="text" id="registerUsername" name="username" placeholder="Nombre de usuario" required>
+						</div>
+						<div class="form-group">
+							<label for="registerEmail">Email</label>
+							<input type="email" id="registerEmail" name="email" placeholder="usuario@ejemplo.com" required>
+						</div>
+						<div class="form-group">
+							<label for="registerPassword">Contraseña</label>
+							<input type="password" id="registerPassword" name="password" placeholder="Mínimo 8 caracteres" required>
+						</div>
+						<div class="form-group">
+							<label for="registerConfirmPassword">Confirmar contraseña</label>
+							<input type="password" id="registerConfirmPassword" name="confirmPassword" placeholder="Repite la contraseña" required>
+						</div>
+						<div id="registerMessage" class="message" aria-live="polite"></div>
+						<button type="submit" class="btn">Crear cuenta</button>
+					</form>
+				</article>
+
+				<article class="form-card">
+					<h3>Login</h3>
+					<form id="loginForm" novalidate>
+						<div class="form-group">
+							<label for="loginEmail">Email</label>
+							<input type="email" id="loginEmail" name="email" placeholder="usuario@ejemplo.com" required>
+						</div>
+						<div class="form-group">
+							<label for="loginPassword">Contraseña</label>
+							<input type="password" id="loginPassword" name="password" placeholder="Contraseña" required>
+						</div>
+						<div id="loginMessage" class="message" aria-live="polite"></div>
+						<button type="submit" class="btn">Ingresar</button>
+					</form>
+				</article>
+
+				<article class="form-card">
+					<h3>Contacto</h3>
+					<form id="contactForm" novalidate>
+						<div class="form-group">
+							<label for="contactName">Nombre</label>
+							<input type="text" id="contactName" name="name" placeholder="Tu nombre" required>
+						</div>
+						<div class="form-group">
+							<label for="contactSubject">Asunto</label>
+							<input type="text" id="contactSubject" name="subject" placeholder="Asunto del mensaje" required>
+						</div>
+						<div class="form-group">
+							<label for="contactMessage">Mensaje</label>
+							<textarea id="contactMessage" name="message" maxlength="250" placeholder="Escribe tu mensaje aquí" required></textarea>
+						</div>
+						<div class="field-row">
+							<span id="messageCounter" class="char-counter">0/250</span>
+						</div>
+						<div id="contactResult" class="message" aria-live="polite"></div>
+						<button type="submit" class="btn">Enviar mensaje</button>
+					</form>
+				</article>
+			</div>
+		</section>
+
 	</main>
 
 	<footer id="contacto">
