@@ -102,8 +102,8 @@
         const dec = e.target.closest('.cart-dec'); if(dec){ changeQty(dec.dataset.id,-1); return; }
         const inc = e.target.closest('.cart-inc'); if(inc){ changeQty(inc.dataset.id,1); return; }
         const rem = e.target.closest('.cart-remove'); if(rem){ removeFromCart(rem.dataset.id); return; }
-        const clear = e.target.closest('#clearCart'); if(clear){ localStorage.removeItem(CART_KEY); renderCartPanel(); updateCartCount(); return; }
-        const checkout = e.target.closest('#checkoutBtn'); if(checkout){ alert('Checkout demo — integrar pasarela de pago'); localStorage.removeItem(CART_KEY); renderCartPanel(); updateCartCount(); return; }
+        const clear = e.target.closest('#clearCart'); if(clear){ localStorage.removeItem(CART_KEY); updateCartCount(); const panel = document.querySelector('.cart-panel'); if(panel) panel.remove(); return; }
+        const checkout = e.target.closest('#checkoutBtn'); if(checkout){ alert('Checkout demo — integrar pasarela de pago'); localStorage.removeItem(CART_KEY); updateCartCount(); const panel = document.querySelector('.cart-panel'); if(panel) panel.remove(); return; }
     });
 
     // Iniciar contador de carrito
