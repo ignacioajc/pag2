@@ -207,7 +207,14 @@
         loginMessage: document.getElementById('loginMessage'),
         contactResult: document.getElementById('contactResult'),
         contactMessageField: document.getElementById('contactMessage'),
-        messageCounter: document.getElementById('messageCounter')
+        messageCounter: document.getElementById('messageCounter'),
+        authModal: document.getElementById('authModal'),
+        loginBtn: document.getElementById('loginBtn'),
+        closeModal: document.getElementById('closeModal'),
+        tabLogin: document.getElementById('tabLogin'),
+        tabRegister: document.getElementById('tabRegister'),
+        loginTab: document.getElementById('loginTab'),
+        registerTab: document.getElementById('registerTab')
     };
 
     function getInputValue(id){
@@ -268,6 +275,37 @@
         form.reset();
         const messages = form.querySelectorAll('.message');
         messages.forEach(msg => { msg.textContent = ''; msg.classList.remove('message--error', 'message--success'); });
+    }
+
+    function openModal(){
+        if(formState.authModal){
+            formState.authModal.classList.add('active');
+            formState.authModal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeModal(){
+        if(formState.authModal){
+            formState.authModal.classList.remove('active');
+            formState.authModal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+    }
+
+    function switchTab(tab){
+        const tabs = ['login', 'register'];
+        tabs.forEach(t => {
+            const btn = formState[`tab${t.charAt(0).toUpperCase() + t.slice(1)}`];
+            const content = formState[`${t}Tab`];
+            if(t === tab){
+                btn.classList.add('active');
+                content.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+                content.classList.remove('active');
+            }
+        });
     }
 
     function handleRegisterSubmit(event){
@@ -343,6 +381,27 @@
     if(formState.contactMessageField){
         formState.contactMessageField.addEventListener('input', updateMessageCounter);
         updateMessageCounter();
+    }
+
+    // Modal y tabs
+    if(formState.loginBtn){
+        formState.loginBtn.addEventListener('click', openModal);
+    }
+    if(formState.closeModal){
+        formState.closeModal.addEventListener('click', closeModal);
+    }
+    if(formState.authModal){
+        formState.authModal.addEventListener('click', (e) => {
+            if(e.target === formState.authModal.querySelector('.modal-overlay')){
+                closeModal();
+            }
+        });
+    }
+    if(formState.tabLogin){
+        formState.tabLogin.addEventListener('click', () => switchTab('login'));
+    }
+    if(formState.tabRegister){
+        formState.tabRegister.addEventListener('click', () => switchTab('register'));
     }
 
     // Delegación para botones "Agregar al carrito" desde cualquier página
