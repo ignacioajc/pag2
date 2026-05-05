@@ -1,5 +1,18 @@
-/* Formulario contactar cliente */
-.contactar-cliente-form {
+/* Carrusel de imágenes */
+.carousel-section { padding: 0; margin: 0; }
+.carousel-section.carousel-hero { width: 100%; height: 600px; display: block; background: linear-gradient(135deg, #f3f1e7 0%, #ffffff 100%); }
+.carousel { position: relative; width: 100%; height: 100%; }
+.carousel-track { width: 100%; height: 100%; overflow: hidden; position: relative; display: flex; flex-wrap: nowrap; transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); }
+.carousel-slide { flex: 0 0 100%; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #fff; }
+.carousel-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; color: #181818; font-size: 3.5rem; font-weight: bold; width: 70px; height: 70px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; }
+.carousel-btn:hover { background: #fff; transform: translateY(-50%) scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.carousel-btn.prev { left: 30px; }
+.carousel-btn.next { right: 30px; }
+.carousel-indicators { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 10; }
+.indicator { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.6); border: 2px solid rgba(255,255,255,0.8); cursor: pointer; transition: all 0.3s ease; }
+.indicator.active { background: #fff; width: 30px; border-radius: 7px; }
+@media(max-width:768px) { .carousel-section.carousel-hero { height: 400px; } .carousel-btn { width: 60px; height: 60px; font-size: 2.5rem; } .carousel-btn.prev { left: 15px; } .carousel-btn.next { right: 15px; } .carousel-indicators { bottom: 20px; gap: 8px; } .indicator { width: 10px; height: 10px; } .indicator.active { width: 24px; } }\nbody.darkmode .carousel-section.carousel-hero { background: linear-gradient(135deg, #2d2d38 0%, #23232b 100%); }\nbody.darkmode .carousel-btn { background: rgba(45,45,56,0.95); color: #e0e0e0; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }\n\n/* Formulario contactar cliente */\n.contactar-cliente-form {
     margin-top: 2rem;
     padding: 1.1rem 1rem 1.3rem 1rem;
     background: var(--card);
@@ -470,14 +483,17 @@ body{font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvet
 /* Subastas */
 .auction-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:1rem;
+    grid-template-columns:repeat(auto-fit,minmax(520px,1fr));
+    gap:1.5rem;
     margin-top:1rem;
 }
+@media(max-width:1024px){.auction-grid{grid-template-columns:1fr;}}
 .auction-card{
     background:var(--card);
     border:1px solid var(--border);
-    padding:0.8rem;border-radius:8px;display:flex;flex-direction:column;gap:0.5rem
+    padding:1rem;
+    border-radius:8px;
+    gap:0.5rem
 }
 .auction-card:hover{transform:translateY(-4px);box-shadow:0 8px 18px rgba(0,0,0,0.06)}
 .auction-card img{width:100%;height:120px;object-fit:cover;border-radius:6px}

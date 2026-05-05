@@ -1,3 +1,74 @@
+// Carrusel de imágenes con fade
+(function(){
+    function initCarousel(){
+        const track = document.querySelector('.carousel-track');
+        const slides = Array.from(document.querySelectorAll('.carousel-slide'));
+        const prevBtn = document.querySelector('.carousel-btn.prev');
+        const nextBtn = document.querySelector('.carousel-btn.next');
+        const indicators = Array.from(document.querySelectorAll('.indicator'));
+        let currentIndex = 0;
+        let autoPlayInterval;
+
+        if(!track || slides.length === 0) return;
+
+        slides.forEach((slide, idx) => {
+            slide.style.position = 'absolute';
+            slide.style.opacity = idx === 0 ? '1' : '0';
+            slide.style.transition = 'opacity 0.8s ease-in-out';
+        });
+
+        function updateCarousel(){
+            slides.forEach((slide, idx) => {
+                slide.style.opacity = idx === currentIndex ? '1' : '0';
+            });
+            indicators.forEach((indicator, idx) => {
+                indicator.classList.toggle('active', idx === currentIndex);
+            });
+        }
+
+        function nextSlide(){
+            currentIndex = (currentIndex + 1) % slides.length;
+            updateCarousel();
+            resetAutoPlay();
+        }
+
+        function prevSlide(){
+            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+            updateCarousel();
+            resetAutoPlay();
+        }
+
+        function autoPlay(){
+            autoPlayInterval = setInterval(nextSlide, 5000);
+        }
+
+        function resetAutoPlay(){
+            clearInterval(autoPlayInterval);
+            autoPlay();
+        }
+
+        prevBtn?.addEventListener('click', prevSlide);
+        nextBtn?.addEventListener('click', nextSlide);
+        
+        indicators.forEach((indicator, idx) => {
+            indicator.addEventListener('click', () => {
+                currentIndex = idx;
+                updateCarousel();
+                resetAutoPlay();
+            });
+        });
+
+        updateCarousel();
+        autoPlay();
+    }
+
+    if(document.readyState === 'loading'){
+        document.addEventListener('DOMContentLoaded', initCarousel);
+    } else {
+        initCarousel();
+    }
+})();
+
 // Modo oscuro con transición suave, carrito y subastas de ejemplo
 (function(){
     const body = document.body;
@@ -109,32 +180,97 @@
     // Iniciar contador de carrito
     updateCartCount();
 
-    // ---------------- Subastas de ejemplo ----------------
-    const auctions = [
-        {id:'air-zone-1', title:'Air Zone 1 (Limited)', img:'images/bball-shoe.svg', currentBid:129.99, ends: Date.now()+1000*60*60*6},
-        {id:'raptor-gloves', title:'Guantes Raptor (Signed)', img:'images/boxing-gloves.svg', currentBid:199.00, ends: Date.now()+1000*60*60*24},
-        {id:'speedkick-fg', title:'SpeedKick FG (Rare)', img:'images/football-boot.svg', currentBid:249.50, ends: Date.now()+1000*60*45}
+    // ---------------- Subastas con localStorage ----------------
+    const AUCTIONS_KEY = 'shop_auctions_v1';
+    const BIDS_KEY = 'shop_bids_v1';
+    
+    const mockUsers = [
+        {id:1, name:'Juan M.', avatar:'👨‍💼'},
+        {id:2, name:'María L.', avatar:'👩‍💼'},
+        {id:3, name:'Carlos R.', avatar:'👨‍💻'},
+        {id:4, name:'Ana P.', avatar:'👩‍💻'},
+        {id:5, name:'Diego H.', avatar:'👨‍🎨'}
     ];
+
+    function loadAuctions(){
+        try{
+            const saved = localStorage.getItem(AUCTIONS_KEY);
+            return saved ? JSON.parse(saved) : [
+                {id:'air-zone-1', title:'Air Zone 1 (Limited)', img:'images/bball-shoe.svg', currentBid:129.99, ends: Date.now()+1000*60*60*6},
+                {id:'raptor-gloves', title:'Guantes Raptor (Signed)', img:'images/boxing-gloves.svg', currentBid:199.00, ends: Date.now()+1000*60*60*24},
+                {id:'speedkick-fg', title:'SpeedKick FG (Rare)', img:'images/football-boot.svg', currentBid:249.50, ends: Date.now()+1000*60*45}
+            ];
+        }catch(e){
+            return [
+                {id:'air-zone-1', title:'Air Zone 1 (Limited)', img:'images/bball-shoe.svg', currentBid:129.99, ends: Date.now()+1000*60*60*6},
+                {id:'raptor-gloves', title:'Guantes Raptor (Signed)', img:'images/boxing-gloves.svg', currentBid:199.00, ends: Date.now()+1000*60*60*24},
+                {id:'speedkick-fg', title:'SpeedKick FG (Rare)', img:'images/football-boot.svg', currentBid:249.50, ends: Date.now()+1000*60*45}
+            ];
+        }
+    }
+
+    function saveAuctions(auctions){
+        localStorage.setItem(AUCTIONS_KEY, JSON.stringify(auctions));
+    }
+
+    function loadBids(){
+        try{
+            return JSON.parse(localStorage.getItem(BIDS_KEY)) || {};
+        }catch(e){
+            return {};
+        }
+    }
+
+    function saveBids(bids){
+        localStorage.setItem(BIDS_KEY, JSON.stringify(bids));
+    }
+
+    let auctions = loadAuctions();
+    let allBids = loadBids();
 
     const auctionGrid = document.getElementById('auctionGrid');
 
     function formatCurrency(v){ return '€' + v.toFixed(2); }
 
+    function renderBidHistory(auctionId){
+        const bids = allBids[auctionId] || [];
+        if(bids.length === 0) return '<div style="font-size:0.9rem;color:var(--text);opacity:0.7;">Sin pujas aún</div>';
+        return bids.slice(-3).reverse().map((bid,i) => {
+            const user = mockUsers.find(u=>u.id===bid.userId) || {name:'Usuario',avatar:'👤'};
+            return `<div style="display:flex;align-items:center;gap:0.4rem;font-size:0.85rem;padding:0.3rem 0;border-bottom:1px solid var(--border);">
+                <span>${user.avatar}</span>
+                <span style="flex:1;color:var(--text);">${user.name}</span>
+                <strong>${formatCurrency(bid.amount)}</strong>
+            </div>`;
+        }).join('');
+    }
+
     function renderAuctions(){
         if(!auctionGrid) return;
         auctionGrid.innerHTML = '';
         auctions.forEach(a => {
-            const card = document.createElement('div'); card.className='auction-card';
+            const bidHistory = renderBidHistory(a.id);
+            const card = document.createElement('div'); 
+            card.className='auction-card';
+            card.style.display = 'grid';
+            card.style.gridTemplateColumns = '1fr 1fr';
+            card.style.gap = '1rem';
             card.innerHTML = `
-                <img src="${a.img}" alt="${a.title}">
-                <h4>${a.title}</h4>
-                <div class="auction-meta">
-                    <div class="auction-price">${formatCurrency(a.currentBid)}</div>
-                    <div class="auction-countdown" data-ends="${a.ends}">--:--:--</div>
+                <div>
+                    <img src="${a.img}" alt="${a.title}" style="width:100%;height:200px;object-fit:cover;border-radius:8px;margin-bottom:0.5rem;">
+                    <h4 style="margin:0.3rem 0;font-size:1rem;">${a.title}</h4>
+                    <div class="auction-meta">
+                        <div class="auction-price" style="font-weight:bold;color:var(--accent);">${formatCurrency(a.currentBid)}</div>
+                        <div class="auction-countdown" data-ends="${a.ends}" style="font-size:0.9rem;color:var(--text);">--:--:--</div>
+                    </div>
+                    <div style="display:flex;gap:0.3rem;margin-top:0.5rem;">
+                        <a class="btn" href="product.html?id=${a.id}&auction=1" style="flex:1;font-size:0.9rem;padding:0.5rem;">Detalles</a>
+                        <button class="btn bid-btn" data-id="${a.id}" style="flex:1;font-size:0.9rem;padding:0.5rem;">Pujar</button>
+                    </div>
                 </div>
-                <div style="display:flex;gap:.5rem;justify-content:space-between;align-items:center;">
-                    <a class="btn" href="product.html?id=${a.id}&auction=1">Ir a subasta</a>
-                    <button class="btn bid-btn" data-id="${a.id}">Pujar</button>
+                <div style="border-left:1px solid var(--border);padding-left:1rem;">
+                    <h5 style="margin:0 0 0.5rem 0;font-size:0.9rem;color:var(--accent);">Historial de pujas</h5>
+                    <div style="font-size:0.85rem;">${bidHistory}</div>
                 </div>
             `;
             auctionGrid.appendChild(card);
@@ -154,15 +290,23 @@
         });
     }
 
-    // Interacción simple de puja (mock)
+    // Interacción de puja con histórico
     document.addEventListener('click', (e)=>{
         const btn = e.target.closest('.bid-btn');
         if(!btn) return;
-        const id = btn.dataset.id;
-        const auction = auctions.find(a=>a.id===id);
+        const auctionId = btn.dataset.id;
+        const auction = auctions.find(a=>a.id===auctionId);
         if(!auction) return;
+        
         const increment = Math.max(1, Math.round(auction.currentBid*0.05));
         auction.currentBid = Math.round((auction.currentBid + increment)*100)/100;
+        
+        const randomUser = mockUsers[Math.floor(Math.random()*mockUsers.length)];
+        if(!allBids[auctionId]) allBids[auctionId] = [];
+        allBids[auctionId].push({userId:randomUser.id, amount:auction.currentBid, time:Date.now()});
+        
+        saveAuctions(auctions);
+        saveBids(allBids);
         renderAuctions();
     });
 
