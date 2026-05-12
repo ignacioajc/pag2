@@ -499,9 +499,6 @@
         return errors;
     }
 
-    function authenticateLogin(credentials){
-        return credentials.email === secureUser.email && credentials.password === secureUser.password;
-    }
 
     function clearForm(form){
         if(!form) return;
