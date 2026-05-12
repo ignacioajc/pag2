@@ -337,11 +337,8 @@
         });
     }
 
-    const secureUser = {
-        username: 'alumno',
-        email: 'alumno@ejemplo.com',
-        password: 'Alu123456'
-    };
+    const USERS_KEY = 'site_users_v1';
+    const CURRENT_USER_KEY = 'current_user_v1';
 
     const formState = {
         registerForm: document.getElementById('registerForm'),
@@ -360,6 +357,96 @@
         loginTab: document.getElementById('loginTab'),
         registerTab: document.getElementById('registerTab')
     };
+
+    // --- Autenticación: almacenamiento local + inicialización desde js/users.json ---
+    async function hashPassword(password){
+        const enc = new TextEncoder();
+        const data = enc.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+
+    function loadUsers(){
+        try{ return JSON.parse(localStorage.getItem(USERS_KEY)) || []; }catch(e){ return []; }
+    }
+
+    function saveUsers(users){
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
+
+    async function initUsersFromJSON(){
+        const existing = loadUsers();
+        if(existing.length) return; // ya inicializado
+        try{
+            const res = await fetch('js/users.json', {cache: 'no-store'});
+            if(!res.ok) return;
+            const data = await res.json();
+            // Esperamos que data sea un array con usuarios con campos: username,email,password (plain) opcional
+            const users = [];
+            for(const u of data){
+                if(!u.email || !u.password) continue;
+                const passHash = await hashPassword(u.password);
+                users.push({id: crypto.randomUUID(), username: u.username||u.email.split('@')[0], email: u.email, passwordHash: passHash, createdAt: Date.now()});
+            }
+            if(users.length) saveUsers(users);
+        }catch(e){ /* ignore */ }
+    }
+
+    function findUserByEmail(email){
+        return loadUsers().find(u => u.email.toLowerCase() === (email||'').toLowerCase());
+    }
+
+    async function registerUser({username, email, password}){
+        const exists = findUserByEmail(email);
+        if(exists) return {ok:false, message: 'Ya existe una cuenta con ese email.'};
+        const passwordHash = await hashPassword(password);
+        const users = loadUsers();
+        const user = { id: crypto.randomUUID(), username, email, passwordHash, createdAt: Date.now() };
+        users.push(user);
+        saveUsers(users);
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({id: user.id, username: user.username, email: user.email}));
+        return {ok:true, user};
+    }
+
+    async function loginUser({email,password}){
+        const user = findUserByEmail(email);
+        if(!user) return {ok:false, message:'Usuario no encontrado.'};
+        const hash = await hashPassword(password);
+        if(hash !== user.passwordHash) return {ok:false, message:'Contraseña incorrecta.'};
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({id: user.id, username: user.username, email: user.email}));
+        return {ok:true, user};
+    }
+
+    function logoutUser(){
+        localStorage.removeItem(CURRENT_USER_KEY);
+        updateAuthUI();
+    }
+
+    function getCurrentUser(){
+        try{ return JSON.parse(localStorage.getItem(CURRENT_USER_KEY)); }catch(e){ return null; }
+    }
+
+    function updateAuthUI(){
+        const cur = getCurrentUser();
+        const loginBtn = document.getElementById('loginBtn');
+        if(loginBtn){
+            if(cur){
+                loginBtn.textContent = `👤 ${cur.username}`;
+                loginBtn.title = 'Cuenta';
+                loginBtn.setAttribute('aria-label','Cuenta');
+                loginBtn.dataset.logged = '1';
+            } else {
+                loginBtn.textContent = '👤';
+                loginBtn.title = 'Iniciar sesión';
+                loginBtn.setAttribute('aria-label','Iniciar sesión');
+                delete loginBtn.dataset.logged;
+            }
+        }
+    }
+
+    // Inicializar usuarios desde JSON si no hay datos
+    initUsersFromJSON().then(()=> updateAuthUI());
 
     function getInputValue(id){
         const input = document.getElementById(id);
@@ -405,6 +492,8 @@
     function validateContact(data){
         const errors = [];
         if(!data.name) errors.push('Nombre obligatorio.');
+        if(!data.email) errors.push('Email obligatorio.');
+        else if(!isValidEmail(data.email)) errors.push('Email con formato incorrecto.');
         if(!data.subject) errors.push('Asunto obligatorio.');
         if(!data.message) errors.push('Mensaje obligatorio.');
         return errors;
@@ -466,7 +555,21 @@
             showMessage(formState.registerMessage, errors.join(' '));
             return;
         }
-        showMessage(formState.registerMessage, `Registro válido. Bienvenido ${payload.username}.`, 'success');
+        // Registrar usuario (almacenamiento local)
+        registerUser({username: payload.username, email: payload.email, password: payload.password}).then(res => {
+            if(!res.ok){
+                showMessage(formState.registerMessage, res.message || 'Error al crear la cuenta.');
+                return;
+            }
+            showMessage(formState.registerMessage, `Cuenta creada. Bienvenido ${payload.username}.`, 'success');
+            updateAuthUI();
+            setTimeout(()=>{
+                clearForm(formState.registerForm);
+                closeModal();
+            }, 800);
+        }).catch(err=>{
+            showMessage(formState.registerMessage, 'Error interno al registrar.');
+        });
     }
 
     function handleLoginSubmit(event){
@@ -481,11 +584,20 @@
             showMessage(formState.loginMessage, errors.join(' '));
             return;
         }
-        if(!authenticateLogin(payload)){
-            showMessage(formState.loginMessage, 'Credenciales incorrectas, revisa email y contraseña.');
-            return;
-        }
-        showMessage(formState.loginMessage, 'Ingreso exitoso. Usuario autenticado.', 'success');
+        loginUser(payload).then(res => {
+            if(!res.ok){
+                showMessage(formState.loginMessage, res.message || 'Credenciales incorrectas.');
+                return;
+            }
+            showMessage(formState.loginMessage, 'Ingreso exitoso. Usuario autenticado.', 'success');
+            updateAuthUI();
+            setTimeout(()=>{
+                clearForm(formState.loginForm);
+                closeModal();
+            },700);
+        }).catch(err=>{
+            showMessage(formState.loginMessage, 'Error interno al autenticar.');
+        });
     }
 
     function updateMessageCounter(){
@@ -499,6 +611,7 @@
         event.preventDefault();
         const payload = {
             name: getInputValue('contactName'),
+            email: getInputValue('contactEmail'),
             subject: getInputValue('contactSubject'),
             message: getInputValue('contactMessage')
         };
@@ -529,7 +642,15 @@
 
     // Modal y tabs
     if(formState.loginBtn){
-        formState.loginBtn.addEventListener('click', openModal);
+        formState.loginBtn.addEventListener('click', ()=>{
+            const cur = getCurrentUser();
+            if(cur){
+                const ok = confirm(`¿Cerrar sesión de ${cur.username}?`);
+                if(ok) logoutUser();
+            } else {
+                openModal();
+            }
+        });
     }
     if(formState.closeModal){
         formState.closeModal.addEventListener('click', closeModal);
