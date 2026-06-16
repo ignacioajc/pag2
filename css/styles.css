@@ -132,6 +132,11 @@ body.darkmode .servicio-contacto a:hover {
     transition: background 0.2s, color 0.2s;
 }
 
+/* Theme icon responds to page zoom and base font-size via CSS variables */
+.darkmode-btn svg { display:block; margin:0 auto; width:20px; height:20px; color:var(--text); transition:transform .12s ease, stroke-width .12s ease; }
+.darkmode-btn svg circle { transition: stroke-width .12s ease, r .12s ease; }
+.darkmode-btn { --icon-scale: 1; --icon-stroke: 1px; }
+
 /* Variables para modo oscuro (se aplican cuando body tiene clase .darkmode) */
 body.darkmode{
     --bg: #23232b;

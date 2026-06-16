@@ -104,6 +104,32 @@
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     setTheme(stored ? stored === 'dark' : prefersDark);
 
+    // Restore font size and page zoom from localStorage and expose CSS vars for icon
+    (function restoreFontAndZoom(){
+        const root = document.documentElement;
+        const storedFont = localStorage.getItem('fontSize');
+        const storedZoom = localStorage.getItem('pageZoom');
+        const font = storedFont ? parseInt(storedFont,10) : null;
+        const zoom = storedZoom ? parseInt(storedZoom,10) : null;
+
+        if(font && !Number.isNaN(font)){
+            document.documentElement.style.fontSize = font + 'px';
+        }
+        if(zoom && !Number.isNaN(zoom)){
+            document.body.style.zoom = zoom + '%';
+        }
+
+        // Map zoom -> icon scale, fontSize -> icon stroke
+        const effectiveZoom = zoom || 100;
+        const effectiveFont = font || parseInt(window.getComputedStyle(document.documentElement).fontSize,10) || 16;
+        const scale = Math.max(0.8, Math.min(1.3, effectiveZoom / 100));
+        // stroke between 1 and 3 px mapped from font 12-24
+        const stroke = (1 + ((Math.max(12, Math.min(24, effectiveFont)) - 12) / (24 - 12)) * 2).toFixed(2);
+
+        root.style.setProperty('--icon-scale', String(scale));
+        root.style.setProperty('--icon-stroke', stroke + 'px');
+    })();
+
     btn.addEventListener('click', ()=> setTheme(!document.body.classList.contains('darkmode')));
 
     // ---------------- Cart (localStorage) ----------------
