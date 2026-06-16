@@ -568,6 +568,10 @@ body{font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvet
 .modal-content{position:relative;background:var(--card);border-radius:14px;padding:2rem;max-width:400px;width:90%;max-height:90vh;overflow-y:auto;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,0.15);}
 .modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.5rem;color:var(--text);cursor:pointer;padding:0.5rem;border-radius:50%;transition:background 0.2s;}
 .modal-close:hover{background:var(--border);}
+#accessModal .modal-content{max-width:520px;padding:1.4rem;}
+.accessibility-modal .form-group{margin-bottom:1rem}
+.accessibility-modal #fontSizeDisplay, .accessibility-modal #zoomDisplay{min-width:56px;text-align:center;display:inline-block}
+.accessibility-modal .btn{padding:.45rem .7rem;border-radius:6px}
 #authModalTitle{margin-top:0;margin-bottom:1.5rem;color:var(--accent);}
 .tab-buttons{display:flex;margin-bottom:1.5rem;border-bottom:1px solid var(--border);}
 .tab-btn{flex:1;padding:0.75rem 1rem;background:none;border:none;color:var(--text);cursor:pointer;font-weight:600;border-bottom:2px solid transparent;transition:border-color 0.2s;}

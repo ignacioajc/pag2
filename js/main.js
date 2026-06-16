@@ -130,6 +130,72 @@
         root.style.setProperty('--icon-stroke', stroke + 'px');
     })();
 
+        // Accessibility controls: functions to update fontSize and pageZoom and update icon vars
+        function setFontSize(value){
+            const f = Math.max(12, Math.min(24, Number(value)));
+            document.documentElement.style.fontSize = f + 'px';
+            localStorage.setItem('fontSize', String(f));
+            // update icon stroke
+            const strokeVal = (1 + ((f - 12) / (24 - 12)) * 2).toFixed(2);
+            document.documentElement.style.setProperty('--icon-stroke', strokeVal + 'px');
+            const zoomNow = parseInt(localStorage.getItem('pageZoom') || '100',10);
+            const scaleVal = Math.max(0.8, Math.min(1.3, zoomNow/100));
+            document.documentElement.style.setProperty('--icon-scale', String(scaleVal));
+            const disp = document.getElementById('fontSizeDisplay'); if(disp) disp.textContent = f + 'px';
+        }
+
+        function setPageZoom(value){
+            const z = Math.max(80, Math.min(130, Number(value)));
+            document.body.style.zoom = z + '%';
+            localStorage.setItem('pageZoom', String(z));
+            const scaleVal = Math.max(0.8, Math.min(1.3, z/100));
+            document.documentElement.style.setProperty('--icon-scale', String(scaleVal));
+            const fontNow = parseInt(localStorage.getItem('fontSize') || window.getComputedStyle(document.documentElement).fontSize,10) || 16;
+            const strokeVal = (1 + ((Math.max(12, Math.min(24, fontNow)) - 12) / (24 - 12)) * 2).toFixed(2);
+            document.documentElement.style.setProperty('--icon-stroke', strokeVal + 'px');
+            const disp = document.getElementById('zoomDisplay'); if(disp) disp.textContent = z + '%';
+        }
+
+        // Wire up accessibility panel buttons (if present)
+        document.addEventListener('DOMContentLoaded', ()=>{
+            const accessBtn = document.getElementById('accessBtn');
+            const accessModal = document.getElementById('accessModal');
+            const accessOverlay = accessModal?.querySelector('.modal-overlay');
+            const closeAccess = document.getElementById('closeAccess');
+            const accessToggleTheme = document.getElementById('accessToggleTheme');
+            const fontInc = document.getElementById('fontInc');
+            const fontDec = document.getElementById('fontDec');
+            const zoomInc = document.getElementById('zoomInc');
+            const zoomDec = document.getElementById('zoomDec');
+
+            if(accessBtn && accessModal){
+                accessBtn.addEventListener('click', ()=>{
+                    accessModal.classList.add('active');
+                    accessModal.setAttribute('aria-hidden','false');
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+            if(accessOverlay){
+                accessOverlay.addEventListener('click', ()=>{
+                    accessModal.classList.remove('active');
+                    accessModal.setAttribute('aria-hidden','true');
+                    document.body.style.overflow = '';
+                });
+            }
+            if(closeAccess){ closeAccess.addEventListener('click', ()=>{ accessModal.classList.remove('active'); accessModal.setAttribute('aria-hidden','true'); document.body.style.overflow = ''; }); }
+            if(accessToggleTheme){ accessToggleTheme.addEventListener('click', ()=>{ btn && btn.click(); }); }
+
+            // Font/zoom controls
+            if(fontInc) fontInc.addEventListener('click', ()=>{ const now = parseInt(window.getComputedStyle(document.documentElement).fontSize,10)||16; setFontSize(now+1); });
+            if(fontDec) fontDec.addEventListener('click', ()=>{ const now = parseInt(window.getComputedStyle(document.documentElement).fontSize,10)||16; setFontSize(now-1); });
+            if(zoomInc) zoomInc.addEventListener('click', ()=>{ const now = parseInt(localStorage.getItem('pageZoom')||'100',10)||100; setPageZoom(now+5); });
+            if(zoomDec) zoomDec.addEventListener('click', ()=>{ const now = parseInt(localStorage.getItem('pageZoom')||'100',10)||100; setPageZoom(now-5); });
+
+            // Initialize displays
+            const fontDisp = document.getElementById('fontSizeDisplay'); if(fontDisp) fontDisp.textContent = (parseInt(localStorage.getItem('fontSize')|| window.getComputedStyle(document.documentElement).fontSize,10)||16) + 'px';
+            const zoomDisp = document.getElementById('zoomDisplay'); if(zoomDisp) zoomDisp.textContent = (parseInt(localStorage.getItem('pageZoom')|| '100',10)||100) + '%';
+        });
+
     btn.addEventListener('click', ()=> setTheme(!document.body.classList.contains('darkmode')));
 
     // ---------------- Cart (localStorage) ----------------
