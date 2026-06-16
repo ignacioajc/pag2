@@ -59,6 +59,8 @@ export default function App() {
   const [cartVisible, setCartVisible] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [darkMode, setDarkMode] = useState(false)
+  const [accessibilityOpen, setAccessibilityOpen] = useState(false)
+  const [fontSize, setFontSize] = useState(16)
   const [authUser, setAuthUser] = useState(getCurrentUserService())
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authTab, setAuthTab] = useState('login')
@@ -79,6 +81,23 @@ export default function App() {
   useEffect(() => {
     initUsersFromJSON().then(() => setAuthUser(getCurrentUserService()))
   }, [])
+
+  useEffect(() => {
+    const saved = parseInt(localStorage.getItem('fontSize'))
+    if (saved && saved >= 12 && saved <= 24) {
+      setFontSize(saved)
+      document.documentElement.style.fontSize = saved + 'px'
+    }
+  }, [])
+
+  const handleFontSize = (delta) => {
+    setFontSize((prev) => {
+      const next = Math.min(24, Math.max(12, prev + delta))
+      document.documentElement.style.fontSize = next + 'px'
+      localStorage.setItem('fontSize', next)
+      return next
+    })
+  }
 
   const updateCartState = () => setCartCount(getCartCount())
 
@@ -131,7 +150,7 @@ export default function App() {
         setAuthMessage({ text: result.message || 'Error al iniciar sesión.', type: 'error' })
         return
       }
-      setAuthUser(getCurrentUserServiceService())
+      setAuthUser(getCurrentUserService())
       setAuthMessage({ text: `Bienvenido de nuevo, ${result.user.username}.`, type: 'success' })
       setTimeout(() => {
         setAuthModalOpen(false)
@@ -154,7 +173,7 @@ export default function App() {
       setAuthMessage({ text: result.message || 'Error al registrarse.', type: 'error' })
       return
     }
-    setAuthUser(getCurrentUser())
+    setAuthUser(getCurrentUserService())
     setAuthMessage({ text: `Cuenta creada. Bienvenido ${username}.`, type: 'success' })
     setTimeout(() => {
       setAuthModalOpen(false)
@@ -169,15 +188,53 @@ export default function App() {
     <div>
       <header>
         <button
-          id="darkModeBtn"
-          aria-label="Activar modo oscuro"
-          title="Modo oscuro"
+          id="accessibilityBtn"
+          aria-label="Opciones de accesibilidad"
+          title="Accesibilidad"
           className="darkmode-btn"
           type="button"
-          onClick={() => setDarkMode((value) => !value)}
+          onClick={() => setAccessibilityOpen((v) => !v)}
         >
-          {darkMode ? '☀️' : '🌙'}
+          ♿
         </button>
+
+        {accessibilityOpen && (
+          <>
+            <div
+              style={{ position: 'fixed', inset: 0, zIndex: 1100 }}
+              onClick={() => setAccessibilityOpen(false)}
+            />
+            <div style={{
+              position: 'fixed', top: '4rem', right: '1rem', zIndex: 1200,
+              background: 'var(--bg)', border: '1px solid var(--border)',
+              borderRadius: '10px', padding: '1.2rem', minWidth: '220px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.2)', color: 'var(--text)'
+            }}>
+              <h3 style={{ margin: '0 0 1rem 0', fontSize: '1rem' }}>Accesibilidad</h3>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <div style={{ marginBottom: '.4rem', fontSize: '.9rem' }}>Tema</div>
+                <button type="button" className="btn" onClick={() => setDarkMode((v) => !v)}>
+                  {darkMode ? '☀️ Modo claro' : '🌙 Modo oscuro'}
+                </button>
+              </div>
+
+              <div>
+                <div style={{ marginBottom: '.4rem', fontSize: '.9rem' }}>Tamaño de letra</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}>
+                  <button type="button" className="btn" onClick={() => handleFontSize(-2)}>A−</button>
+                  <span style={{ minWidth: '2.5rem', textAlign: 'center' }}>{fontSize}px</span>
+                  <button type="button" className="btn" onClick={() => handleFontSize(2)}>A+</button>
+                </div>
+              </div>
+
+              <button type="button" className="btn" style={{ marginTop: '1rem', width: '100%' }}
+                onClick={() => setAccessibilityOpen(false)}>
+                Cerrar
+              </button>
+            </div>
+          </>
+        )}
         <button
           id="navToggle"
           className="nav-toggle"
