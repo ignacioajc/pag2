@@ -27,6 +27,7 @@ export default function Home({ searchQuery, onAddToCart, products, categories, f
   const [auctions, setAuctions] = useState(loadAuctions)
   const [bids, setBids] = useState(loadBids)
   const [clock, setClock] = useState(Date.now())
+  const [currentSlide, setCurrentSlide] = useState(0)
   const [contactStatus, setContactStatus] = useState({ text: '', type: 'error' })
 
   useEffect(() => {
@@ -125,7 +126,8 @@ export default function Home({ searchQuery, onAddToCart, products, categories, f
     <main>
       <section id="carousel" className="carousel-section carousel-hero">
         <div className="carousel">
-          <button className="carousel-btn prev" aria-label="Anterior" type="button" onClick={() => {}}>
+          <button className="carousel-btn prev" aria-label="Anterior" type="button"
+            onClick={() => setCurrentSlide((i) => (i - 1 + heroSlides.length) % heroSlides.length)}>
             ❮
           </button>
           <div className="carousel-track">
@@ -133,13 +135,14 @@ export default function Home({ searchQuery, onAddToCart, products, categories, f
               <div
                 key={src}
                 className="carousel-slide"
-                style={{ opacity: index === 0 ? 1 : 0, position: 'absolute', width: '100%', height: '100%' }}
+                style={{ opacity: index === currentSlide ? 1 : 0, position: 'absolute', width: '100%', height: '100%' }}
               >
                 <img src={src} alt={`Imagen deportiva ${index + 1}`} />
               </div>
             ))}
           </div>
-          <button className="carousel-btn next" aria-label="Siguiente" type="button" onClick={() => {}}>
+          <button className="carousel-btn next" aria-label="Siguiente" type="button"
+            onClick={() => setCurrentSlide((i) => (i + 1) % heroSlides.length)}>
             ❯
           </button>
         </div>
