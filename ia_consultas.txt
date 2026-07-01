@@ -1,0 +1,45 @@
+========================================================================
+BITÁCORA DE CONSULTAS A INTELIGENCIA ARTIFICIAL (IA) - PROYECTO EVA4
+========================================================================
+
+Este archivo detalla los prompts (preguntas y directrices) recomendados para establecer principios de seguridad, sanitización de datos contra XSS en localStorage, y el manejo correcto de errores y estados de carga en peticiones HTTP asíncronas.
+
+------------------------------------------------------------------------
+TEMA 1: Principios de Seguridad y Sanitización XSS en LocalStorage
+------------------------------------------------------------------------
+
+**Prompt sugerido para la IA:**
+"Estoy desarrollando una aplicación SPA en React donde los usuarios pueden crear y editar productos a través de formularios. Estos productos se guardan en el LocalStorage del navegador.
+¿Qué medidas de seguridad debo implementar para evitar ataques de Cross-Site Scripting (XSS) al almacenar y posteriormente renderizar strings ingresados por el usuario?
+Proporcióname una función helper en JavaScript para sanitizar las entradas de texto antes de guardarlas y explica cómo aplicarla en los inputs."
+
+**Resumen de la recomendación de seguridad implementada:**
+1. Sanitización de caracteres peligrosos antes del guardado: se deben escapar caracteres de control HTML como `<`, `>`, `&`, `"`, `'`, `/` para evitar que el navegador interprete texto del usuario como etiquetas ejecutables.
+2. Uso de formularios controlados en React: React por defecto escapa las variables que se renderizan dentro de las llaves `{}` (JSX), a menos que se use `dangerouslySetInnerHTML`. Sin embargo, es buena práctica sanitizar antes de guardar en base de datos local (localStorage) para garantizar la integridad de los datos estructurados.
+
+**Función de escape implementada en el proyecto:**
+const sanitizeInput = (str) => {
+  if (typeof str !== 'string') return ''
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;')
+}
+
+------------------------------------------------------------------------
+TEMA 2: Consumo de APIs Asíncronas y Manejo de Errores con Try-Catch
+------------------------------------------------------------------------
+
+**Prompt sugerido para la IA:**
+"Necesito realizar una llamada a una API REST pública (como la API de tipos de cambio de divisas `open.er-api.com`) utilizando 'fetch' en un hook useEffect en React. 
+¿Cuál es la forma correcta y recomendada de estructurar el código asíncrono para gestionar fallos de red, estados de carga (loading) y alertas de error en la UI usando bloques try-catch?
+Además, incluye un mecanismo de reintento en caso de fallo."
+
+**Resumen de la recomendación implementada:**
+1. Crear tres estados en React: `rates` (para los datos), `ratesLoading` (para la retroalimentación de carga) y `ratesError` (para guardar el mensaje en caso de falla).
+2. Estructurar la función asíncrona dentro del hook y usar `try-catch` para capturar excepciones físicas de red (como falta de conexión) y verificar manualmente el valor de `response.ok` antes de parsear el JSON.
+3. Mostrar un banner interactivo en la interfaz con un botón para re-ejecutar la petición de cambio (`fetchRates`).
+4. Utilizar tasas de cambio de respaldo (fallbacks) estables en el estado inicial por si el servicio falla por completo.

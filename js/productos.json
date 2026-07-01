@@ -1,0 +1,24 @@
+{
+  "categories": [
+    {
+      "title": "Artes Marciales",
+      "description": "Guantillas, kimonos, protecciones y más."
+    },
+    {
+      "title": "Basketball",
+      "description": "Balones, zapatillas y equipamiento de alto rendimiento."
+    },
+    {
+      "title": "Fútbol",
+      "description": "Botas, balones y accesorios para todos los niveles."
+    }
+  ],
+  "products": [
+    { "id": "kimono-pro-x", "title": "Kimono Pro X", "category": "Artes Marciales", "price": 59.99, "img": "images/kids-gi.svg" },
+    { "id": "raptor-gloves", "title": "Guantes Raptor", "category": "Artes Marciales", "price": 79.99, "img": "images/boxing-gloves.svg" },
+    { "id": "air-zone-1", "title": "Air Zone 1", "category": "Basketball", "price": 129.99, "img": "images/bball-shoe.svg" },
+    { "id": "balon-elite", "title": "Balón Elite", "category": "Basketball", "price": 34.99, "img": "images/basketball.svg" },
+    { "id": "speedkick-fg", "title": "SpeedKick FG", "category": "Fútbol", "price": 149.99, "img": "images/football-boot.svg" },
+    { "id": "balon-match", "title": "Balón Match", "category": "Fútbol", "price": 44.99, "img": "images/football.svg" }
+  ]
+}

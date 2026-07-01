@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Link } from 'react-router-dom'
 import Home from './pages/Home'
 import Product from './pages/Product'
+import AdminPanel from './pages/AdminPanel'
 import {
   addToCart,
   changeCartQty,
@@ -12,7 +13,7 @@ import {
 } from './cartService'
 import { getCurrentUserService, initUsersFromJSON, loginUser, logoutUser, registerUser } from './authService'
 
-function CartPanel({ visible, onClose, onChangeQty, onRemove, onClear }) {
+function CartPanel({ visible, onClose, onChangeQty, onRemove, onClear, formatPrice }) {
   const cartItems = useMemo(() => getCartItems(), [visible])
   const total = cartItems.reduce((sum, item) => sum + (item.price || 0) * (item.qty || 1), 0)
 
@@ -30,7 +31,7 @@ function CartPanel({ visible, onClose, onChangeQty, onRemove, onClear }) {
               <img src={item.img} alt={item.title} />
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 700 }}>{item.title}</div>
-                <div style={{ color: 'var(--muted)' }}>€{(item.price || 0).toFixed(2)}</div>
+                <div style={{ color: 'var(--muted)' }}>{formatPrice(item.price)}</div>
               </div>
               <div className="cart-actions">
                 <button type="button" onClick={() => onChangeQty(item.id, -1)}>-</button>
@@ -42,7 +43,7 @@ function CartPanel({ visible, onClose, onChangeQty, onRemove, onClear }) {
           ))}
           <div style={{ padding: '.6rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <strong>Total</strong>
-            <strong>€{total.toFixed(2)}</strong>
+            <strong>{formatPrice(total)}</strong>
           </div>
           <div style={{ padding: '.4rem', display: 'flex', gap: '.5rem' }}>
             <button type="button" className="btn" onClick={onClose}>Cerrar</button>
@@ -64,6 +65,104 @@ export default function App() {
   const [authTab, setAuthTab] = useState('login')
   const [authMessage, setAuthMessage] = useState({ text: '', type: 'error' })
   const [navOpen, setNavOpen] = useState(false)
+
+  // -- EVA4 States --
+  const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
+  const [currency, setCurrency] = useState(() => localStorage.getItem('shop_currency_v1') || 'EUR')
+  const [rates, setRates] = useState({ EUR: 1, USD: 1.09, CLP: 980 })
+  const [ratesLoading, setRatesLoading] = useState(true)
+  const [ratesError, setRatesError] = useState(null)
+
+  // Load products and categories from localStorage orproductos.json
+  useEffect(() => {
+    const PRODUCTS_KEY = 'shop_products_v1'
+    const CATEGORIES_KEY = 'shop_categories_v1'
+    
+    const localProducts = localStorage.getItem(PRODUCTS_KEY)
+    const localCategories = localStorage.getItem(CATEGORIES_KEY)
+    
+    if (localProducts && localCategories) {
+      setProducts(JSON.parse(localProducts))
+      setCategories(JSON.parse(localCategories))
+    } else {
+      fetch('/js/productos.json')
+        .then((res) => {
+          if (!res.ok) throw new Error('Error al cargar productos iniciales.')
+          return res.json()
+        })
+        .then((data) => {
+          setProducts(data.products)
+          setCategories(data.categories)
+          localStorage.setItem(PRODUCTS_KEY, JSON.stringify(data.products))
+          localStorage.setItem(CATEGORIES_KEY, JSON.stringify(data.categories))
+        })
+        .catch((err) => {
+          console.error('Error al inicializar catálogo:', err)
+        })
+    }
+  }, [])
+
+  // Currency API Fetch
+  const fetchRates = async () => {
+    setRatesLoading(true)
+    setRatesError(null)
+    try {
+      const res = await fetch('https://open.er-api.com/v6/latest/EUR')
+      if (!res.ok) throw new Error('Error al contactar con la API de tipos de cambio.')
+      const data = await res.json()
+      if (data && data.rates) {
+        setRates(data.rates)
+      } else {
+        throw new Error('Datos de divisas no válidos.')
+      }
+    } catch (err) {
+      setRatesError('Error de red al actualizar divisas. Usando tasas aproximadas.')
+      console.error(err)
+    } finally {
+      setRatesLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchRates()
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('shop_currency_v1', currency)
+  }, [currency])
+
+  const formatPrice = (priceInEUR) => {
+    const rate = rates[currency] || 1
+    const converted = (priceInEUR || 0) * rate
+    if (currency === 'CLP') {
+      return `$${Math.round(converted).toLocaleString('es-CL')} CLP`
+    }
+    if (currency === 'USD') {
+      return `$${converted.toFixed(2)} USD`
+    }
+    return `€${converted.toFixed(2)}`
+  }
+
+  const saveProductsToStorage = (updatedProducts) => {
+    setProducts(updatedProducts)
+    localStorage.setItem('shop_products_v1', JSON.stringify(updatedProducts))
+  }
+
+  const handleAddProduct = (newProduct) => {
+    const updated = [...products, { ...newProduct, id: crypto.randomUUID() }]
+    saveProductsToStorage(updated)
+  }
+
+  const handleUpdateProduct = (updatedProduct) => {
+    const updated = products.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
+    saveProductsToStorage(updated)
+  }
+
+  const handleDeleteProduct = (productId) => {
+    const updated = products.filter((p) => p.id !== productId)
+    saveProductsToStorage(updated)
+  }
 
   useEffect(() => {
     const storedTheme = localStorage.getItem('theme')
@@ -131,7 +230,7 @@ export default function App() {
         setAuthMessage({ text: result.message || 'Error al iniciar sesión.', type: 'error' })
         return
       }
-      setAuthUser(getCurrentUserServiceService())
+      setAuthUser(getCurrentUserService())
       setAuthMessage({ text: `Bienvenido de nuevo, ${result.user.username}.`, type: 'success' })
       setTimeout(() => {
         setAuthModalOpen(false)
@@ -154,7 +253,7 @@ export default function App() {
       setAuthMessage({ text: result.message || 'Error al registrarse.', type: 'error' })
       return
     }
-    setAuthUser(getCurrentUser())
+    setAuthUser(getCurrentUserService())
     setAuthMessage({ text: `Cuenta creada. Bienvenido ${username}.`, type: 'success' })
     setTimeout(() => {
       setAuthModalOpen(false)
@@ -163,10 +262,54 @@ export default function App() {
     }, 800)
   }
 
-  const cartItems = useMemo(() => getCartItems(), [cartCount, cartVisible])
-
   return (
     <div>
+      {ratesError && (
+        <div style={{
+          background: '#fee2e2',
+          color: '#991b1b',
+          padding: '.8rem',
+          textAlign: 'center',
+          fontSize: '.9rem',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '1rem',
+          borderBottom: '1px solid #fca5a5',
+          fontWeight: 600
+        }}>
+          <span>⚠️ {ratesError}</span>
+          <button 
+            type="button" 
+            onClick={fetchRates} 
+            style={{
+              background: '#991b1b', 
+              color: '#fff', 
+              border: 'none', 
+              borderRadius: '4px', 
+              padding: '.3rem .7rem', 
+              cursor: 'pointer',
+              fontSize: '.8rem'
+            }}
+          >
+            Reintentar
+          </button>
+        </div>
+      )}
+      {ratesLoading && !ratesError && (
+        <div style={{
+          background: '#e0f2fe',
+          color: '#0369a1',
+          padding: '.5rem',
+          textAlign: 'center',
+          fontSize: '.85rem',
+          borderBottom: '1px solid #bae6fd',
+          fontWeight: 500
+        }}>
+          🔄 Cargando tipos de cambio de divisas en tiempo real...
+        </div>
+      )}
+
       <header>
         <button
           id="darkModeBtn"
@@ -189,12 +332,12 @@ export default function App() {
         </button>
         <div className={`logo-nav${navOpen ? ' open' : ''}`}>
           <div className="logo-space">
-            <img src="images/logo.png" alt="Logo" className="logo" />
+            <Link to="/"><img src="/images/logo.png" alt="Logo" className="logo" /></Link>
           </div>
           <nav>
             <ul>
               <li>
-                <a href="/#hero">Inicio</a>
+                <Link to="/">Inicio</Link>
               </li>
               <li>
                 <a href="/#tienda">Tienda</a>
@@ -205,9 +348,32 @@ export default function App() {
               <li>
                 <a href="/#contacto">Contacto soporte</a>
               </li>
+              <li>
+                <Link to="/admin" style={{ fontWeight: 'bold', color: 'var(--accent)' }}>Administración</Link>
+              </li>
             </ul>
           </nav>
           <div className="header-actions">
+            <select
+              className="currency-select"
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+              aria-label="Seleccionar divisa"
+              style={{
+                background: 'var(--bg-card, #2c2c2c)',
+                color: 'var(--text, #fff)',
+                border: '1px solid var(--border, #444)',
+                borderRadius: '4px',
+                padding: '.35rem .6rem',
+                marginRight: '.5rem',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              <option value="EUR">EUR (€)</option>
+              <option value="USD">USD ($)</option>
+              <option value="CLP">CLP ($)</option>
+            </select>
             <label htmlFor="siteSearch" className="sr-only">
               Buscar productos
             </label>
@@ -247,6 +413,7 @@ export default function App() {
         onChangeQty={handleChangeQty}
         onRemove={handleRemoveItem}
         onClear={handleClearCart}
+        formatPrice={formatPrice}
       />
 
       <div className={`modal${authModalOpen ? ' active' : ''}`} role="dialog" aria-labelledby="authModalTitle" aria-hidden={!authModalOpen}>
@@ -298,9 +465,57 @@ export default function App() {
       </div>
 
       <Routes>
-        <Route path="/" element={<Home searchQuery={searchTerm} onAddToCart={handleAddToCart} />} />
-        <Route path="/product" element={<Product onAddToCart={handleAddToCart} />} />
-        <Route path="/product/:id" element={<Product onAddToCart={handleAddToCart} />} />
+        <Route 
+          path="/" 
+          element={
+            <Home 
+              searchQuery={searchTerm} 
+              onAddToCart={handleAddToCart} 
+              products={products}
+              categories={categories}
+              formatPrice={formatPrice}
+            />
+          } 
+        />
+        <Route 
+          path="/product" 
+          element={
+            <Product 
+              onAddToCart={handleAddToCart} 
+              products={products}
+              formatPrice={formatPrice}
+              rates={rates}
+              currency={currency}
+            />
+          } 
+        />
+        <Route 
+          path="/product/:id" 
+          element={
+            <Product 
+              onAddToCart={handleAddToCart} 
+              products={products}
+              formatPrice={formatPrice}
+              rates={rates}
+              currency={currency}
+            />
+          } 
+        />
+        <Route 
+          path="/admin" 
+          element={
+            <AdminPanel 
+              products={products} 
+              categories={categories} 
+              onAddProduct={handleAddProduct} 
+              onUpdateProduct={handleUpdateProduct} 
+              onDeleteProduct={handleDeleteProduct} 
+              formatPrice={formatPrice}
+              rates={rates}
+              currency={currency}
+            />
+          } 
+        />
       </Routes>
     </div>
   )

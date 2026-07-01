@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { auctionProducts, categories, heroSlides, randomUsers } from '../data'
+import { auctionProducts, heroSlides, randomUsers } from '../data'
 
 const AUCTIONS_KEY = 'shop_auctions_v1'
 const BIDS_KEY = 'shop_bids_v1'
@@ -23,7 +23,7 @@ function loadBids() {
   }
 }
 
-export default function Home({ searchQuery, onAddToCart }) {
+export default function Home({ searchQuery, onAddToCart, products, categories, formatPrice }) {
   const [auctions, setAuctions] = useState(loadAuctions)
   const [bids, setBids] = useState(loadBids)
   const [clock, setClock] = useState(Date.now())
@@ -42,19 +42,39 @@ export default function Home({ searchQuery, onAddToCart }) {
     localStorage.setItem(BIDS_KEY, JSON.stringify(bids))
   }, [bids])
 
-  const filteredCategories = useMemo(
-    () => categories.map((category) => ({
-      ...category,
-      products: category.products.filter((product) =>
-        product.title.toLowerCase().includes(searchQuery.toLowerCase())
+  // Derive categories dynamically to support custom categories added in the Admin Panel
+  const dynamicCategories = useMemo(() => {
+    if (!products || products.length === 0) return []
+    
+    // Get unique categories from products
+    const uniqueCatNames = Array.from(new Set(products.map((p) => p.category)))
+    
+    // Build categories objects
+    return uniqueCatNames.map((catName) => {
+      const defaultCat = categories.find((c) => c.title.toLowerCase() === catName.toLowerCase())
+      return {
+        title: catName,
+        description: defaultCat ? defaultCat.description : 'Categoría personalizada de productos.',
+        products: []
+      }
+    })
+  }, [categories, products])
+
+  // Filter categories and products based on the search query
+  const filteredCategories = useMemo(() => {
+    return dynamicCategories.map((cat) => {
+      const catProducts = products.filter((p) => p.category === cat.title)
+      const filtered = catProducts.filter((p) =>
+        p.title.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    })).filter((category) => category.products.length > 0),
-    [searchQuery]
-  )
+      return {
+        ...cat,
+        products: filtered
+      }
+    }).filter((cat) => cat.products.length > 0)
+  }, [dynamicCategories, products, searchQuery])
 
   const featuredProducts = filteredCategories.flatMap((category) => category.products)
-
-  const formatCurrency = (value) => `€${value.toFixed(2)}`
 
   const formatCountdown = (endTime) => {
     const diff = endTime - clock
@@ -142,11 +162,16 @@ export default function Home({ searchQuery, onAddToCart }) {
                   <article className="product-card" key={product.id} data-name={product.title}>
                     <img src={product.img} alt={product.title} loading="lazy" />
                     <h4>{product.title}</h4>
-                    <p className="price">{formatCurrency(product.price)}</p>
+                    <p className="price">{formatPrice(product.price)}</p>
                     <Link className="btn" to={`/product/${product.id}`}>
                       Ver artículo
                     </Link>
-                    <button type="button" className="btn" style={{ marginTop: '0.6rem' }} onClick={() => onAddToCart({ id: product.id, title: product.title, price: product.price, img: product.img, qty: 1 })}>
+                    <button 
+                      type="button" 
+                      className="btn" 
+                      style={{ marginTop: '0.6rem' }} 
+                      onClick={() => onAddToCart({ id: product.id, title: product.title, price: product.price, img: product.img, qty: 1 })}
+                    >
                       Añadir al carrito
                     </button>
                   </article>
@@ -169,7 +194,7 @@ export default function Home({ searchQuery, onAddToCart }) {
               <img src={auction.img} alt={auction.title} />
               <h4>{auction.title}</h4>
               <div className="auction-meta">
-                <div className="auction-price">{formatCurrency(auction.currentBid)}</div>
+                <div className="auction-price">{formatPrice(auction.currentBid)}</div>
                 <div className="auction-countdown">{formatCountdown(auction.ends)}</div>
               </div>
               <div style={{ display: 'flex', gap: '0.8rem', marginTop: '0.8rem' }}>
@@ -188,7 +213,7 @@ export default function Home({ searchQuery, onAddToCart }) {
                     <div key={`${auction.id}-${index}`} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', padding: '0.3rem 0', borderBottom: '1px solid var(--border)' }}>
                       <span>{user.avatar}</span>
                       <span style={{ flex: 1, color: 'var(--text)' }}>{user.name}</span>
-                      <strong>{formatCurrency(bid.amount)}</strong>
+                      <strong>{formatPrice(bid.amount)}</strong>
                     </div>
                   )
                 })}
